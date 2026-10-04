@@ -888,3 +888,13 @@ pre code {
 .game-score [hidden] {
   display:none;
 }
+
+.game-picker {
+  flex-wrap:wrap;
+}
+.game-picker button {
+  flex:1 1 130px;
+}
+.game-controls [hidden] {
+  display:none;
+}

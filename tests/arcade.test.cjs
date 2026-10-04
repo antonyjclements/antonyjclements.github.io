@@ -19,20 +19,25 @@ function arcade() {
     close() { this.open = false; this.emit('close'); }
     setPointerCapture() {}
   }
-  const elements = Object.fromEntries(['.motion-toggle', 'span', '#score', '#wave', '.game-status', '.restart-game', '.close-game', '.game-instructions', '[data-control="fire"]', '#lives', '#lives-display', 'canvas'].map(selector => [selector, new Element()]));
+  const elements = Object.fromEntries(['.motion-toggle', 'span', '#score', '#wave', '.game-status', '.restart-game', '.close-game', '.game-instructions', '[data-control="fire"]', '[data-control="up"]', '[data-control="down"]', '#lives', '#lives-display', 'canvas'].map(selector => [selector, new Element()]));
   const drawn = [];
   const painted = {};
   elements.canvas.getContext = () => ({
     fillRect(x, y, width, height) {
+      if (width === 480 && height === 340) { painted.walls = []; painted.ghosts = []; }
+      if (this.fillStyle === '#365fba' && width === 18) painted.walls.push(`${Math.round((x - 31) / 20)},${Math.round((y - 21) / 20)}`);
+      if (['#6775e8', '#f27c9f', '#7bdde4', '#af91ee'].includes(this.fillStyle) && width === 10 && height === 3)
+        painted.ghosts.push({ x: Math.round((x - 35) / 20), y: Math.round((y - 23) / 20) });
       if (this.fillStyle === '#eef1f6' && width === 8 && height === 8) painted.ball = { x: x + 4, y: y + 4 };
       if (this.fillStyle === '#b7ef74' && width === 80 && height === 8) painted.paddle = { x, y };
     },
+    beginPath() {}, moveTo() {}, arc(x,y) { painted.runner = { x: Math.round((x - 40) / 20), y: Math.round((y - 30) / 20) }; }, closePath() {}, fill() {},
     fillText(text) { drawn.push(text); },
   });
   const dialog = new Element();
   const trigger = new Element();
-  const gameButtons = ['invaders', 'breakout'].map(game => { const button = new Element(); button.dataset.game = game; return button; });
-  const touchButtons = ['left', 'fire', 'right'].map(control => { const button = new Element(); button.dataset.control = control; return button; });
+  const gameButtons = ['invaders', 'breakout', 'maze'].map(game => { const button = new Element(); button.dataset.game = game; return button; });
+  const touchButtons = ['left', 'fire', 'right', 'up', 'down'].map(control => { const button = new Element(); button.dataset.control = control; return button; });
   const doc = new Element();
   doc.querySelector = selector => elements[selector];
   doc.querySelectorAll = () => [trigger];
@@ -184,4 +189,87 @@ test('a quick Space tap or LAUNCH click serves Breakout without holding a button
     a.tick(200);
     assert.ok(Number(a.elements['#score'].textContent) > 0, launch);
   }
+});
+
+
+test('Maze Chase selects its own controls and collects pellets using a quick direction tap', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[2].emit('click');
+  assert.match(a.elements.canvas.attrs['aria-label'], /Maze Chase/);
+  assert.equal(a.elements['[data-control="fire"]'].hidden, true);
+  assert.equal(a.elements['[data-control="up"]'].hidden, false);
+  a.elements['.restart-game'].emit('click');
+  a.key('ArrowRight'); a.doc.emit('keyup', { key: 'ArrowRight' }); a.tick(35);
+  assert.ok(Number(a.elements['#score'].textContent) >= 20);
+  assert.equal(a.elements['#lives'].textContent, '03');
+});
+
+test('Maze Chase supports touch turns, wall collisions, power pellets and restart', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[2].emit('click');
+  a.elements['.restart-game'].emit('click');
+  a.touchButtons[3].emit('pointerdown', { pointerId: 1 }); a.touchButtons[3].emit('pointerup');
+  a.tick(40);
+  assert.ok(Number(a.elements['#score'].textContent) > 0);
+  const wallScore = a.elements['#score'].textContent;
+  a.tick(20);
+  assert.equal(a.elements['#score'].textContent, wallScore);
+  a.elements['.restart-game'].emit('click');
+  a.key('ArrowRight'); a.tick(160);
+  assert.match(a.elements['.game-status'].textContent, /Power/);
+  a.elements['.restart-game'].emit('click');
+  assert.equal(a.elements['#score'].textContent, '00000');
+  assert.equal(a.elements['#lives'].textContent, '03');
+  a.gameButtons[0].emit('click');
+  assert.equal(a.elements['[data-control="fire"]'].hidden, false);
+  assert.equal(a.elements['[data-control="up"]'].hidden, true);
+  assert.equal(a.hasFrame(), false);
+});
+
+
+test('Maze Chase ghosts consume all lives and closing or switching stops the old game', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[2].emit('click');
+  a.elements['.restart-game'].emit('click'); a.tick(18000);
+  assert.equal(a.elements['#lives'].textContent, '00');
+  assert.match(a.elements['.game-status'].textContent, /Game over/);
+  assert.equal(a.hasFrame(), false);
+  a.elements['.restart-game'].emit('click');
+  a.doc.hidden = true; a.tick(300);
+  assert.equal(a.elements['#score'].textContent, '00000');
+  a.doc.hidden = false; a.tick(35);
+  assert.ok(Number(a.elements['#score'].textContent) > 0);
+  a.dialog.close();
+  assert.equal(a.hasFrame(), false);
+});
+
+
+test('a powered maze runner can chase and eat a ghost for bonus points', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[2].emit('click');
+  a.elements['.restart-game'].emit('click'); a.tick(150);
+  assert.match(a.elements['.game-status'].textContent, /Power/);
+  const directions = [['ArrowLeft', -1, 0], ['ArrowRight', 1, 0], ['ArrowUp', 0, -1], ['ArrowDown', 0, 1]];
+  let ateGhost = false;
+  for (let frame = 0; frame < 480 && !ateGhost; frame++) {
+    const walls = new Set(a.painted.walls);
+    const queue = [{ ...a.painted.runner, first: null }];
+    const seen = new Set();
+    for (let i = 0; i < queue.length; i++) {
+      const cell = queue[i];
+      if (a.painted.ghosts.some(ghost => ghost.x === cell.x && ghost.y === cell.y) && cell.first) {
+        a.key(cell.first); break;
+      }
+      for (const [key, dx, dy] of directions) {
+        const x = cell.x + dx, y = cell.y + dy, id = `${x},${y}`;
+        if (x < 0 || x >= 21 || y < 0 || y >= 15 || walls.has(id) || seen.has(id)) continue;
+        seen.add(id); queue.push({ x, y, first: cell.first || key });
+      }
+    }
+    const score = Number(a.elements['#score'].textContent);
+    a.tick();
+    ateGhost = Number(a.elements['#score'].textContent) - score >= 200;
+  }
+  assert.equal(ateGhost, true);
+  assert.equal(a.elements['#lives'].textContent, '03');
 });

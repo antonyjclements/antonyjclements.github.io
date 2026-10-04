@@ -16,11 +16,13 @@ lives in `assets/`. Add the shared header, footer, stylesheet, and deferred scri
 when creating a new post.
 
 Enter **↑ ↑ ↓ ↓ ← → ← → B A** to unlock the secret arcade, or select **INSERT
-COIN** in the footer (also works on touch screens). Pick **Invaders** or
-**Breakout**, then press **START**. Move with arrow keys or A/D. In Invaders,
+COIN** in the footer (also works on touch screens). Pick **Invaders**,
+**Breakout**, or **Maze Chase**, then press **START**. Move with arrow keys or A/D. In Invaders,
 Space fires; in Breakout, Space or **LAUNCH** serves the ball. Breakout has three
 lives, paddle-angle rebounds, and successive brick waves. Touch controls are
-below each game. Switching games starts a fresh session. Escape closes the arcade. The FX button pauses decorative animation; the theme also respects
+below each game. In Maze Chase, use arrows or WASD to collect pellets and avoid
+ghosts; power pellets let you eat ghosts for eight seconds. Clear the maze to
+advance to the next wave. Switching games starts a fresh session. Escape closes the arcade. The FX button pauses decorative animation; the theme also respects
 reduced-motion preferences. The game pauses when the tab is hidden or unfocused.
 
 Run arcade regression checks with `node --test tests/arcade.test.cjs`.
