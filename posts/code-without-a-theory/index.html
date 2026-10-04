@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code Without a Theory &mdash; Antony Clements</title>
+  <meta name="description" content="An essay on AI agents, code review, and Peter Naur's theory building.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="canonical" href="https://antonyjclements.github.io/posts/code-without-a-theory/">
+</head>
+<body>
+<header>
+  <div class="inner">
+    <h1><a href="/">Antony Clements</a></h1>
+    <p>Notes on AI-augmented software engineering</p>
+  </div>
+</header>
+
+<main>
+  <article>
+    <h1>Code Without a Theory</h1>
+    <p class="meta">Sep 30, 2026 &middot; Antony Clements</p>
+<h2>Twenty approvals</h2>
+<p>File write? Yes. Bash script? Yes. File write? Yes. Install a dependency? Yes. Yes. Yes.</p>
+<p>Somewhere in that run, the agent set up a local file-based data store. I&rsquo;d expected DynamoDB. It never asked me about that one. It asked about everything else, so I was busy clicking through file writes and shell commands while the one decision that changed the shape of the system went through without a prompt. I found it later, reading a file while I was chasing a different bug. I was lucky.</p>
+<p>In fairness to the agent, it didn&rsquo;t do anything obviously wrong. It needed to store some data, and the codebase gave it two examples: some parts wrote to a DynamoDB table, others read a JSON file off disk. It had evidence for both and picked one. What it didn&rsquo;t have was any idea which of those belonged to the system it was working on. Someone who&rsquo;d held that codebase in their head would have had a reason to rule the file option out. The agent never got that reason.</p>
+<p>The agent had none of that background, and I don&rsquo;t think a bigger model fixes that on its own.</p>
+<h2>Naur</h2>
+<p>In 1985, Peter Naur wrote a short paper called <a href="https://ingenieria-de-software-i.github.io/assets/bibliografia/programming-as-theory-building.pdf"><em>Programming as Theory Building</em></a>. His argument is that programming isn&rsquo;t mainly about producing code. The real work is building a theory in the heads of the people doing it: an understanding of the problem, of the program, and of why the code has the shape it has. The code is what&rsquo;s left over.</p>
+<p>Someone who holds that theory can do more than make changes. They can explain the changes, justify them, and answer questions about why the thing works the way it does.</p>
+<p>Then he makes the claim that matters here. In his account, the theory can&rsquo;t be fully written down. He isn&rsquo;t just saying people are bad at documentation. He argues that reviving a program from its documentation alone is &ldquo;strictly impossible.&rdquo; Docs still matter, but they can&rsquo;t stand in for the people. When the team that held the theory breaks up, Naur calls the program dead.</p>
+<p>It helps to separate two things that get lumped together. You can nearly always work out <em>what</em> a system does. Read it, run it, trace it, and the behavior gives itself up. What you can&rsquo;t reliably recover from the code alone is <em>why</em> it does it that way: the option somebody rejected, the constraint that made this design feel obvious. Some of that may never have made it into the code. It was in the people who wrote it.</p>
+<p>A dead program still runs. It can be useful and pass its tests. You find out it&rsquo;s dead the first time someone asks for a change and nobody can say what will break, or whether an odd line was deliberate or just drift.</p>
+<p>If you can&rsquo;t recover the theory from code, checking code you&rsquo;ve been handed is expensive. If you can&rsquo;t fully write the theory down before you build, whatever you build will miss some of what you meant. Those are the two problems I keep running into with agents, and they pull in opposite directions.</p>
+<h2>Reading code is still slow</h2>
+<p>Careful review can mean a few hundred lines an hour, depending on the code and the kind of review. <a href="https://smartbear.com/learn/code-review/best-practices-for-peer-code-review/">SmartBear&rsquo;s guidance</a> recommends staying below 500 lines an hour. It isn&rsquo;t a universal speed limit, but it gives a sense of the scale. Building a model of what a change does, checking it against what it should do, then checking it against the rest of the system takes time. It always has.</p>
+<p>The writing side is what changed. Four hundred lines used to cost an afternoon. An agent now produces them in about the time it takes to read this sentence.</p>
+<p>So the ratio has flipped. Writing used to be the expensive part and review was the tail. Now writing costs almost nothing and review is where the time goes, and most of us are still running a review process built for the old volume at several times that volume.</p>
+<p>That&rsquo;s the easy half. Naur explains the harder half.</p>
+<p>When you write code yourself, you have to make decisions as you go. That doesn&rsquo;t guarantee you understand the whole system. But by the time a diff exists, you&rsquo;ve had a chance to build an understanding of why it looks like that, because you made it look like that.</p>
+<p>When an agent writes it, you can get the code without going through that process. If nobody stays close enough to the decisions, review becomes an attempt to build an understanding that no accountable person has yet developed.</p>
+<p>I don&rsquo;t want to overstate this. Agent output isn&rsquo;t random. It carries your prompt, the examples you showed it, whatever local context it read, and everything it picked up in training. There are scraps of theory in there. A supervising engineer can still hold the system-level understanding and answer questions about it. The risk is that the workflow lets implementation move ahead without anyone doing that work. Code review often quietly relies on someone having done it.</p>
+<p>Naur&rsquo;s dead program had a team once, and the team left. Agent code can show up already in that state on day one: it runs, it&rsquo;s useful, and nobody accountable understands it well enough to change it confidently. When that happens, it costs twice over. There&rsquo;s more of it, and it&rsquo;s harder to check because the reviewer has to build the missing understanding too.</p>
+<h2>The ratchet</h2>
+<p>The usual advice is discipline. Read diffs properly, slow down, build the theory yourself. I don&rsquo;t think discipline is the main problem here. The problem is money and time.</p>
+<p>I started using agents because they&rsquo;re fast. If checking their work costs as much as writing it used to, the speed-up is gone. The person who checks everything doesn&rsquo;t get the productivity they were promised. The person who doesn&rsquo;t check ships code nobody verified. The incentives reward skimming, and you can&rsquo;t fix incentives with a memo.</p>
+<p>It also gets worse over time. I read a diff carefully and it&rsquo;s fine. I read the next one carefully, also fine. By the tenth, careful reading feels like wasted effort, because a quick skim would have got me to the same place. So I skim, and it&rsquo;s fine, and I skim a bit more.</p>
+<p>Weeks later, a bug turns up in production. I trace it to a PR with my name on it, one I know I skimmed. I overcorrect and spend three days reading everything properly. Then the next ten diffs are fine and I drift back.</p>
+<p>The punishment is real, but it arrives rarely and late. The reward for skimming arrives every single time. None of the individual decisions feels reckless while I&rsquo;m making it.</p>
+<p>Better models speed this up. The more often the code is right, the more evidence I collect that careful review was unnecessary, and the sooner I stop doing it. The mistakes that get through become rarer and more convincing, because they&rsquo;re the ones that look right. My attention drops just as the cost of missing something goes up.</p>
+<p>That&rsquo;s what worries me most. The code often isn&rsquo;t bad. It&rsquo;s that judging it gets harder as the models get better.</p>
+<h2>Weren&rsquo;t reviews already bad?</h2>
+<p>You could argue none of this is new. People were approving PRs with &ldquo;LGTM&rdquo; long before agents turned up.</p>
+<p>That&rsquo;s true. But shallow human review often had something underneath it: an author who could explain the work. That never meant they shipped no bugs or understood everything. It meant that when production broke, there was someone to ask what the code assumed, what it touched, and why it was built that way.</p>
+<p>Agent-written code can have that person too, if someone has stayed involved enough to understand it. Take away that understanding and the shallow review is all that&rsquo;s left, with nothing under it.</p>
+<p>Lazy review was always there. Agents make it easier to produce working code without anyone building the understanding that used to help cover for it.</p>
+<h2>The usual fixes, and where they run out</h2>
+<p>Take a simple spec: orders over £100 get 10% off. I meant £100 before tax. The agent read it as including tax and built it that way.</p>
+<p><strong>&ldquo;Get the agent to review its own code.&rdquo;</strong> The agent still believes the threshold includes tax. That belief <em>is</em> the bug, and re-reading its own code won&rsquo;t shake it. It&rsquo;s like proofreading when you&rsquo;re sure &ldquo;definately&rdquo; is spelled right. You can read it fifty times.</p>
+<p><strong>&ldquo;Use a second agent.&rdquo;</strong> Shared training and context can mean shared blind spots. I can&rsquo;t assume the errors are independent. Two smoke alarms feel safer than one until you find out they&rsquo;re on the same fuse.</p>
+<p><strong>&ldquo;Use a model from a different vendor.&rdquo;</strong> This can help. A different model may catch things the first missed. But a different vendor doesn&rsquo;t guarantee independent errors: models can share training material, and here they&rsquo;re reading the same context. And it still doesn&rsquo;t solve the £100 case. The reviewer reads the same ambiguous spec and has to guess too, because neither model can see what I meant. Now I&rsquo;m settling their disagreements by reading, which is the time I was trying to save.</p>
+<p><strong>&ldquo;Tests will catch it.&rdquo;</strong> Tests matter a lot, but tests are code too. Somebody still has to know whether a test captures what was actually intended. I started with four hundred unread lines. Now I have six hundred.</p>
+<p>Who checks the code? The tests. Who checks the tests? More tests, written by whom? You keep stacking layers until you reach something the author didn&rsquo;t make.</p>
+<h2>Pin the behavior before you touch it</h2>
+<p>The regress stops when you compare against something the author didn&rsquo;t create. For changes to existing code, the obvious candidate is the existing code.</p>
+<p>One tool I ended up building for this is a behavior pin. Before an agent rewrites anything, you write a characterization harness: tests that record what the current code actually does. Then you run them against two trees, the old one and the new one.</p>
+<p>Say I have a pricing function using that strictly-over-£100 rule, with a quirk I don&rsquo;t know about. Exactly £100.00 gets no discount. Above the threshold, it rounds the discount down to the nearest penny, so £100.01 gets £10.00 off, but £109.99 gets £10.99 rather than £11.00. I want an agent to tidy the function up without changing what it does.</p>
+<p>First I pin the existing function:</p>
+<pre><code>discount(99.99)  == 0.00
+discount(100.00) == 0.00
+discount(100.01) == 10.00
+discount(109.99) == 10.99   // this case captures the rounding quirk
+</code></pre>
+<p>I run those against the old tree, the code as it sits in git right now, which the agent can&rsquo;t negotiate with. They pass. That matters, because it means the harness describes behavior that exists rather than behavior I wish existed. I can&rsquo;t change the old implementation to suit the tests. I can still write weak tests, though. The fixed tree gives me a reference; it doesn&rsquo;t tell me which cases or observations I&rsquo;ve missed.</p>
+<p>Only then does the agent get to rewrite the function. Afterwards, I run the same assertions against the new tree. If <code>discount(109.99)</code> still returns 10.99, the quirk survived for that input. Green means the new version matches the old one on the behavior the harness checks, which can include details nobody remembered.</p>
+<p>The order is what makes it work. An LLM may well write the tests, so their coverage and assertions still need judgment. But the harness exists before the new code does, and it&rsquo;s been checked against an old tree that isn&rsquo;t up for discussion. Without that ordering, you&rsquo;ve got a student marking their own exam. A pin works because the answer key for those cases was sealed before the student walked in. I have to keep it sealed, rather than let the rewrite quietly change the tests too.</p>
+<p>Two caveats.</p>
+<p>A pin checks that the covered behavior is the same. It doesn&rsquo;t prove the whole implementation is equivalent, or that the behavior is right. In the example, it kept the rounding quirk on the tested inputs, and if that quirk is a bug, the pin carries the bug forward. That&rsquo;s deliberate when the job is to preserve behavior. But green only ever means &ldquo;unchanged on what we checked.&rdquo;</p>
+<p>And brand-new code has no old tree to pin against. That particular reference is missing. You can use other references the author didn&rsquo;t produce, like acceptance tests written by a person, a real upstream API, or recorded production traffic. All of them cost human time. That&rsquo;s the price of having no previous version.</p>
+<p>Every commit turns new code into old code, though, so from version two onwards, changes can be guarded by a reference you got almost for free. The catch runs the other way too. If an agent writes version one and you pin it, the £100 misunderstanding can become the behavior your tests preserve. The first version has no previous implementation to compare against, which is why it deserves more of my own reading time.</p>
+<p>For a deliberate behavior change, somebody still has to approve which expectations change and why. I keep the unaffected behavior pinned and review the expected differences against the new requirement. A bug fix shouldn&rsquo;t fail just because it stops reproducing the old bug, but changing a test to make the build green isn&rsquo;t enough either.</p>
+<h2>Writing down what you mean</h2>
+<p>Now turn the same idea around. On Naur&rsquo;s account, the theory can&rsquo;t be fully captured in a spec any more than it can be recovered from code alone. That&rsquo;s the strongest objection to everything I&rsquo;ve said so far, and I agree with it.</p>
+<p>But I&rsquo;m not trying to capture intent whole. I&rsquo;m trying to capture what it leaves behind. A decision record doesn&rsquo;t say &ldquo;here&rsquo;s what we meant.&rdquo; It says &ldquo;we picked X over Y because of Z.&rdquo; That&rsquo;s something the theory produced rather than the theory itself, and it can be written down. Naur didn&rsquo;t argue for writing nothing. He said documents are necessary and never enough.</p>
+<p>&ldquo;Can&rsquo;t capture it completely&rdquo; also isn&rsquo;t the same as &ldquo;can&rsquo;t capture it usefully.&rdquo; The alternative to an imperfect record isn&rsquo;t a perfect one. It&rsquo;s intent sitting in a Slack thread, or in the head of someone who leaves in March. Every handover between people loses something, whether it&rsquo;s a conversation, a doc or the code itself. If that ruled things out, nobody would talk to each other.</p>
+<p>The objection also cuts the other way. If intent only lives in heads, then an agent, which can&rsquo;t see into anyone&rsquo;s head, starts every session with none of it. Writing down what you can is the only way it will ever get any.</p>
+<p>Sometimes there isn&rsquo;t even one intent to capture. Product means one thing by &ldquo;orders over £100,&rdquo; engineering means another, and everyone thinks they agree because they&rsquo;re using the same words. Writing the spec is what drags that into the open, usually as a review comment that starts &ldquo;wait, I thought we meant…&rdquo;. The disagreement was there all along. In that case the spec isn&rsquo;t a lossy copy of an agreement that already existed. It&rsquo;s where the agreement gets made.</p>
+<h2>The part a machine can&rsquo;t check</h2>
+<p>Every check I&rsquo;ve described compares one thing against another. Pins compare against the old tree. Tests compare against expected outputs. Where there&rsquo;s an outside reference, a machine can do the comparing.</p>
+<p>How would a machine check that a spec matches what I meant? What would it compare against? The only written record is the spec. If a better record existed, that would be the spec. The reference isn&rsquo;t on paper. It&rsquo;s in my head, and the only way to get at it is to ask me.</p>
+<p>So I don&rsquo;t think the human review between intent and spec is a stopgap until models improve. It&rsquo;s where the missing reference lives, and a few things follow from that.</p>
+<p>Specs have to stay live. The dream version of spec-driven development says you write the spec precisely enough and the agent compiles it. If that&rsquo;s your model, the objection is fatal. A compiler only sees what&rsquo;s on the page, so any assumption nobody wrote down quietly disappears, and you get the wrong thing built precisely with no questions asked. Someone who holds the theory reads the same spec and notices what&rsquo;s missing: hang on, what about tax? A compiler can&rsquo;t notice an absence. Keeping the spec live turns one lossy handover into several passes. It doesn&rsquo;t need to be perfect on day one, it just needs enough passes for the gap to show.</p>
+<p>Who reviews matters. Someone who holds the theory can say whether £100 was meant to exclude tax. A reviewer who wasn&rsquo;t in the room may spot the ambiguity, but still needs someone to answer it.</p>
+<p>An LLM can help here, but it can&rsquo;t do this review alone. It can spot the gap (&ldquo;including or excluding tax?&rdquo;) because ambiguity is a property of the text. It can&rsquo;t fill the gap, because the answer isn&rsquo;t anywhere it can see. Its useful job is asking the questions and letting a person answer them. That&rsquo;s real work, but it isn&rsquo;t verification.</p>
+<h3>So what am I accountable for?</h3>
+<p>This is the question I dodged the first time I wrote this up. If I&rsquo;m not reading every line, what am I actually standing behind?</p>
+<p>My answer is the allocation. I&rsquo;m accountable for which decisions got a person, which got a mechanical check, and why. If a pin let a regression through, the pin was mine. If an agent made an architectural call nobody looked at, the rule that let it through unexamined was mine. That&rsquo;s narrower than &ldquo;I read all of it,&rdquo; but I can actually meet it, and it&rsquo;s more honest than putting my name on diffs I skimmed.</p>
+<h3>Keeping my own theory</h3>
+<p>The other thing I skated over is that the human gate assumes a human who still holds the theory. If agents write most of the code, does my understanding slowly rot? I think it can, and I don&rsquo;t have a tidy answer.</p>
+<p>The things I think help are small. Write the spec and the decision records yourself instead of having an agent draft them, because writing them is how you keep the theory. Read the first version of anything new in full, since there&rsquo;s no previous implementation to compare it against. And now and then, build a piece of the system by hand. It&rsquo;s the quickest way I know to find out whether my picture of it is still true.</p>
+<h2>Which decisions get a pause</h2>
+<p>Nurses have a name for what happened to me after twenty approvals: alarm fatigue. Enough false alarms and the real one turns into background noise.</p>
+<p>Agent setups rarely fail because nobody&rsquo;s watching. They fail because the person watching is asked to approve forty low-stakes things and none of the high-stakes ones. Rubber-stamping isn&rsquo;t a moral failing. It&rsquo;s what you get when you ask someone to care about everything at once.</p>
+<p>So which decisions should stop and wait for a person? The usual answer is &ldquo;anything high-risk,&rdquo; but risk turns into a matter of opinion fast. Ask two engineers and you&rsquo;ll get two answers. A question people agree on more easily is: if this is wrong, what does undoing it cost? Cheap, let it go ahead. Expensive, stop.</p>
+<p>The rule in my AGENTS.md reads:</p>
+<blockquote>
+<p>Size the path by reversibility rather than effort: if this is wrong, what does undoing it cost? Cheap to undo - take the smaller path, even when the work is large. Expensive or impossible to undo - data loss, released contracts, security posture, anything others already depend on - take the High-Risk path, even when the diff is one line.</p>
+</blockquote>
+<p>The decision that most needs surfacing is usually the one nobody noticed was being made.</p>
+<p>Here&rsquo;s one that got me. I was moving a UI and its backend-for-frontend onto a new API. I showed the agent the old BFF so it could see what it was replacing. Instead of tracing the downstream services and wiring the new BFF straight to them, it took a shortcut: the new API called the old one.</p>
+<p>Everything resolved. Tests green, clean run. And it wasn&rsquo;t a migration at all. I&rsquo;d built a new layer in front of the layer that was supposed to be retired, and the old one was still doing all the work. Nothing failed, so nothing flagged it. I found it later, by reading.</p>
+<p>I keep seeing the same pattern. The choice arrives as working code instead of as a question. Six months on, those choices are your architecture. Nobody made them in any accountable way, and there&rsquo;s no &ldquo;why&rdquo; to dig up, because there was never a moment when anyone stopped and decided. There was a move that made sense locally, and then the agent carried on.</p>
+<h2>What I built, and what it doesn&rsquo;t fix</h2>
+<p>Augmented Workflow is my attempt to give this work a shape that fits the problem. Where there&rsquo;s an outside reference, it uses mechanical checks. Where the reference only exists in someone&rsquo;s head, it makes the human judgment explicit and puts it where it&rsquo;s needed.</p>
+<p>It lives in the repo, so the guidance sits alongside the code an agent is working on. That doesn&rsquo;t guarantee it&rsquo;ll be read, but it makes it easier to find than a Slack thread, a meeting or the memory of whoever happened to be around last month. Two kinds of thing go in there.</p>
+<p>The first kind keeps human judgment. A living spec says what the system is supposed to do now: requirements, acceptance criteria, constraints, edge cases, open questions. Decision records capture the moment a fork appeared. Local files or DynamoDB. The new API wired to downstream services, or wrapped around the old BFF. £100 with tax or without. Neither pretends to hold the whole theory. They keep what can be kept, so the next person or agent doesn&rsquo;t have to guess the architecture from whatever code happened to get written.</p>
+<p>The second kind compares one artifact against another. Pins compare a rewrite to the old tree. Trace checks that stated requirements link to tests and implementation. Freshness gates check process claims against recorded review markers. Workflow trace compares the path the agent took with the path the work required. None of these proves the work is good. A pin checks &ldquo;same on the covered behavior.&rdquo; Trace checks &ldquo;linked.&rdquo; A freshness gate checks that a recent review is recorded, not that the review happened as claimed or was any good. But each one compares two things instead of asking the system to mark its own homework.</p>
+<p>Now the limits. AGENTS.md isn&rsquo;t a contract. It&rsquo;s still a prompt, and I can&rsquo;t make an agent read it, understand it or follow it. Nobody has solved that. Cursor rules, Spec Kit, BMAD, repo instructions and my own rules all hit the same wall. So nothing that really matters can depend on the agent cooperating. The load-bearing parts have to be ordinary files and ordinary checks that you can inspect without trusting the agent&rsquo;s account of what it did.</p>
+<p>The gap I can&rsquo;t close is decision surfacing. If an agent makes an architectural choice without noticing it was a choice, no script can reliably spot the missing decision record. Noticing that a judgment call happened is itself a judgment call. You can narrow the gap with path-based rules, like requiring a decision record whenever auth, billing, persistence, security posture or public contracts change. You can&rsquo;t close it. That&rsquo;s why the reversibility rule matters so much: the workflow can&rsquo;t see every decision, so it needs a simple test for which ones get a person.</p>
+<h2>So</h2>
+<p>I caught the data store problem because I happened to read the file. That&rsquo;s the exact habit I&rsquo;ve spent this whole piece saying I can&rsquo;t count on any more. The ones I didn&rsquo;t catch are, by definition, in the files I didn&rsquo;t read.</p>
+<p>You&rsquo;re not going to read all of it again. Arithmetic settled that some time last year. What&rsquo;s still up to you is what you choose to read, and what watches the rest.</p>
+<p>Naur said a program dies when the team holding its theory breaks up. We can now produce code without anyone building that theory in the first place. Everything above is my attempt to keep an accountable person involved: mechanical checks where there&rsquo;s something to compare against, and a person paying attention where there never will be.</p>
+  </article>
+</main>
+<footer>
+  <div class="inner">
+    <p>&copy; 2026 Antony Clements &middot; <a href="https://github.com/antonyjclements">GitHub</a> &middot; <a href="/feed.xml">RSS</a></p>
+  </div>
+</footer>
+
+</body>
+</html>
