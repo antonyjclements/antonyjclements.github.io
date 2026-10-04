@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
-    <title>Antony Clements &mdash; Notes on AI-augmented software engineering</title>
+    <title>Antony Clements — Notes on AI-augmented software engineering</title>
     <link>https://antonyjclements.github.io/</link>
     <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
     <language>en-us</language>
@@ -9,8 +9,8 @@
       <title>Code Without a Theory</title>
       <link>https://antonyjclements.github.io/posts/code-without-a-theory/</link>
       <guid isPermaLink="true">https://antonyjclements.github.io/posts/code-without-a-theory/</guid>
-      <pubDate>Tue, 30 Sep 2026 00:00:00 GMT</pubDate>
-      <description>AI agents produce code without building Naur&apos;s theory &mdash; and the review process built for human-scale code can&apos;t keep up. On the flipped cost of writing versus reviewing, the review ratchet, and what actually holds up.</description>
+      <pubDate>Wed, 30 Sep 2026 00:00:00 GMT</pubDate>
+      <description>AI agents produce code without building Naur&apos;s theory — and the review process built for human-scale code can&apos;t keep up. On the flipped cost of writing versus reviewing, the review ratchet, and what actually holds up.</description>
     </item>
   </channel>
 </rss>
