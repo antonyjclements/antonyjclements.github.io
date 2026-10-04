@@ -15,10 +15,12 @@ The home page and essays share `styles.css` and `arcade.js`. Original pixel art
 lives in `assets/`. Add the shared header, footer, stylesheet, and deferred script
 when creating a new post.
 
-Enter **↑ ↑ ↓ ↓ ← → ← → B A** to unlock the invader arcade, or select **INSERT
-COIN** in the footer (also works on touch screens). Start the game, move with
-arrow keys or A/D, and fire with Space. Touch controls are below the game. Escape
-closes it. The FX button pauses decorative animation; the theme also respects
+Enter **↑ ↑ ↓ ↓ ← → ← → B A** to unlock the secret arcade, or select **INSERT
+COIN** in the footer (also works on touch screens). Pick **Invaders** or
+**Breakout**, then press **START**. Move with arrow keys or A/D. In Invaders,
+Space fires; in Breakout, Space or **LAUNCH** serves the ball. Breakout has three
+lives, paddle-angle rebounds, and successive brick waves. Touch controls are
+below each game. Switching games starts a fresh session. Escape closes the arcade. The FX button pauses decorative animation; the theme also respects
 reduced-motion preferences. The game pauses when the tab is hidden or unfocused.
 
 Run arcade regression checks with `node --test tests/arcade.test.cjs`.

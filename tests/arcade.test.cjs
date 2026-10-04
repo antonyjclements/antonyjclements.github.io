@@ -13,17 +13,25 @@ function arcade() {
     }
     setAttribute(name, value) { this.attrs[name] = value; }
     querySelector(selector) { return elements[selector]; }
-    querySelectorAll() { return touchButtons; }
+    querySelectorAll(selector) { return selector === '[data-game]' ? gameButtons : touchButtons; }
     focus() {}
     showModal() { this.open = true; }
     close() { this.open = false; this.emit('close'); }
     setPointerCapture() {}
   }
-  const elements = Object.fromEntries(['.motion-toggle', 'span', '#score', '#wave', '.game-status', '.restart-game', '.close-game', 'canvas'].map(selector => [selector, new Element()]));
+  const elements = Object.fromEntries(['.motion-toggle', 'span', '#score', '#wave', '.game-status', '.restart-game', '.close-game', '.game-instructions', '[data-control="fire"]', '#lives', '#lives-display', 'canvas'].map(selector => [selector, new Element()]));
   const drawn = [];
-  elements.canvas.getContext = () => ({ fillRect() {}, fillText(text) { drawn.push(text); } });
+  const painted = {};
+  elements.canvas.getContext = () => ({
+    fillRect(x, y, width, height) {
+      if (this.fillStyle === '#eef1f6' && width === 8 && height === 8) painted.ball = { x: x + 4, y: y + 4 };
+      if (this.fillStyle === '#b7ef74' && width === 80 && height === 8) painted.paddle = { x, y };
+    },
+    fillText(text) { drawn.push(text); },
+  });
   const dialog = new Element();
   const trigger = new Element();
+  const gameButtons = ['invaders', 'breakout'].map(game => { const button = new Element(); button.dataset.game = game; return button; });
   const touchButtons = ['left', 'fire', 'right'].map(control => { const button = new Element(); button.dataset.control = control; return button; });
   const doc = new Element();
   doc.querySelector = selector => elements[selector];
@@ -38,7 +46,7 @@ function arcade() {
   vm.runInNewContext(fs.readFileSync('arcade.js', 'utf8'), { window: win, document: doc, Date, requestAnimationFrame(fn) { callback = fn; return 1; }, cancelAnimationFrame() { callback = null; } });
   const tick = (count = 1) => { for (let i = 0; i < count && callback; i++) { const fn = callback; callback = null; timestamp += 16; fn(timestamp); } };
   const key = value => doc.emit('keydown', { key: value });
-  return { elements, dialog, trigger, touchButtons, doc, win, classes, drawn, tick, key, hasFrame: () => !!callback };
+  return { elements, dialog, trigger, touchButtons, gameButtons, doc, win, classes, drawn, painted, tick, key, hasFrame: () => !!callback };
 }
 
 test('Konami code opens the arcade; an incorrect sequence does not', () => {
@@ -87,4 +95,93 @@ test('an untouched game ends when invaders reach the build zone', () => {
   assert.match(a.elements['.game-status'].textContent, /Game over/);
   assert.equal(a.hasFrame(), false);
   assert.equal(a.drawn.at(-1), 'BUILD ZONE OVERRUN');
+});
+
+
+test('game picker switches to Breakout, updates instructions and starts a fresh session', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.elements['.restart-game'].emit('click');
+  a.key(' '); a.tick(800);
+  a.gameButtons[1].emit('click');
+  assert.equal(a.gameButtons[1].attrs['aria-pressed'], 'true');
+  assert.equal(a.gameButtons[0].attrs['aria-pressed'], 'false');
+  assert.match(a.elements['.game-instructions'].textContent, /paddle/i);
+  assert.equal(a.elements['#score'].textContent, '00000');
+  assert.equal(a.elements['#lives'].textContent, '03');
+  assert.equal(a.elements['.restart-game'].textContent, 'START');
+  assert.equal(a.hasFrame(), false);
+});
+
+test('Breakout launch breaks bricks and awards points', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[1].emit('click');
+  assert.match(a.elements.canvas.attrs['aria-label'], /Breakout/);
+  a.elements['.restart-game'].emit('click');
+  a.tick(200);
+  assert.equal(a.elements['#score'].textContent, '00000');
+  a.touchButtons[1].emit('pointerdown', { pointerId: 1 });
+  a.tick(200);
+  assert.ok(Number(a.elements['#score'].textContent) > 0);
+});
+
+test('Breakout runs out of lives, restarts, and switches back to Invaders', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[1].emit('click');
+  a.elements['.restart-game'].emit('click'); a.key(' '); a.key('ArrowLeft'); a.tick(6000);
+  assert.equal(a.elements['#lives'].textContent, '00');
+  assert.match(a.elements['.game-status'].textContent, /Game over/);
+  assert.equal(a.hasFrame(), false);
+  a.elements['.restart-game'].emit('click');
+  assert.equal(a.elements['#lives'].textContent, '03');
+  assert.equal(a.elements['#score'].textContent, '00000');
+  a.gameButtons[0].emit('click');
+  assert.match(a.elements['.game-instructions'].textContent, /fire/i);
+  assert.equal(a.elements['#lives-display'].hidden, true);
+  a.elements['.restart-game'].emit('click'); a.key(' '); a.tick(800);
+  assert.ok(Number(a.elements['#score'].textContent) > 0);
+});
+
+
+test('Breakout paddle rebounds keep the ball in play and clearing bricks advances the wave', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[1].emit('click');
+  a.elements['.restart-game'].emit('click'); a.key(' ');
+  for (let i = 0; i < 60000 && a.elements['#wave'].textContent === '01'; i++) {
+    // Play through the public controls using the currently painted ball and paddle.
+    const offset = Math.sin(i / 160) * 18;
+    const target = a.painted.ball.x - 40 + offset;
+    a.doc.emit('keyup', { key: 'ArrowLeft' });
+    a.doc.emit('keyup', { key: 'ArrowRight' });
+    if (a.painted.paddle.x > target + 2) a.key('ArrowLeft');
+    else if (a.painted.paddle.x < target - 2) a.key('ArrowRight');
+    a.tick();
+  }
+  assert.equal(a.elements['#wave'].textContent, '02');
+  assert.equal(a.elements['#score'].textContent, '04000');
+  assert.ok(Number(a.elements['#lives'].textContent) > 0);
+});
+
+test('Breakout pauses while unfocused and closing cancels its frame', () => {
+  const a = arcade();
+  a.trigger.emit('click'); a.gameButtons[1].emit('click');
+  a.elements['.restart-game'].emit('click'); a.key(' ');
+  a.doc.hasFocus = () => false; a.tick(800);
+  assert.equal(a.elements['#score'].textContent, '00000');
+  assert.equal(a.elements['#lives'].textContent, '03');
+  a.doc.hasFocus = () => true; a.tick(200);
+  assert.ok(Number(a.elements['#score'].textContent) > 0);
+  a.dialog.close();
+  assert.equal(a.hasFrame(), false);
+});
+
+test('a quick Space tap or LAUNCH click serves Breakout without holding a button', () => {
+  for (const launch of ['space', 'click']) {
+    const a = arcade();
+    a.trigger.emit('click'); a.gameButtons[1].emit('click');
+    a.elements['.restart-game'].emit('click');
+    if (launch === 'space') { a.key(' '); a.doc.emit('keyup', { key: ' ' }); }
+    else a.elements['[data-control="fire"]'].emit('click');
+    a.tick(200);
+    assert.ok(Number(a.elements['#score'].textContent) > 0, launch);
+  }
 });

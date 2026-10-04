@@ -862,3 +862,29 @@ pre code {
     font-size:15px;
   }
 }
+
+.game-picker {
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+.game-picker button {
+  flex:1;
+  padding:12px 8px;
+  border:1px solid var(--line);
+  background:#131d30;
+  color:var(--muted);
+  font:11px var(--mono);
+  letter-spacing:.5px;
+}
+.game-picker button[aria-pressed="true"] {
+  border-color:var(--lime);
+  color:var(--lime);
+  background:#b7ef7410;
+}
+.game-picker button:hover {
+  border-color:var(--cyan);
+}
+.game-score [hidden] {
+  display:none;
+}
