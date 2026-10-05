@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Did you wash your hands? &mdash; Antony Clements</title>
+  <meta name="description" content="Deterministic checks in agentic development.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="canonical" href="https://antonyjclements.github.io/posts/did-you-wash-your-hands/">
+<meta name="theme-color" content="#0b101b"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><script src="/arcade.js" defer></script>
+</head>
+<body class="article-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner header-row">
+  <a class="brand" href="/" aria-label="Antony Clements home"><span class="brand-icon" aria-hidden="true">&gt;_</span><span>ANTONY<span class="brand-dot">.</span>CLEMENTS</span></a>
+  <nav aria-label="Main navigation"><a href="/#transmissions">Writing</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a></nav>
+  <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button>
+</div></header>
+
+<main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL TRANSMISSIONS</a>
+  <article><p class="eyebrow">TRANSMISSION_002 / AI &amp; ENGINEERING</p>
+    <h1>Did you wash your hands?</h1>
+    <p class="subtitle">Deterministic checks in agentic development</p>
+    <p class="meta"><time datetime="2026-10-05">5 October 2026</time> &middot; Antony Clements</p>
+<p>I have two young children. When I’m cooking dinner, I want them to wash their hands. The only way I can check they’ve done it properly is to go with them to the bathroom and watch. If I’m cooking dinner, that might not be possible.</p>
+<p>So I gather evidence. Did I hear water running? Were they in the bathroom long enough? Do their hands smell clean?</p>
+<p>None of those observations guarantees a good job. Even together, they leave room for doubt. But they give me something to go on beyond “yes, I did it”. I’m looking for signs that the process was followed, while accepting that I haven’t watched it happen.</p>
+<p>I think about agentic development in much the same way. I can ask an agent to review its changes, run the tests and check the requirements. Then I can read its message saying it did all three. The question is what else I have to go on.</p>
+<h2>The part I can check</h2>
+<p>In <a href="https://antonyjclements.github.io/posts/code-without-a-theory/">Code Without a Theory</a>, I wrote about the difficulty of checking code when nobody has built enough understanding of why it looks the way it does. Deterministic checks don’t supply that understanding. They do let me ask narrower questions consistently.</p>
+<p>By deterministic, I mean that the check applies explicit rules to its inputs. Given the same inputs, it reaches the same answer. A script can establish that a required file is missing, that an identifier has no matching reference, or that particular files changed after a recorded review.</p>
+<p>“Was this review thoughtful?” is a different sort of question. So is “did we build what the user actually meant?” Neither becomes a simple comparison just because I would like to automate it.</p>
+<p>There’s still a lot of useful work in the narrower questions. If the workflow requires a review record and there isn’t one, I can stop. I don’t need another model to interpret the omission. If the record exists, I have something more specific to inspect.</p>
+<h2>A receipt for the review</h2>
+<p>One example lives in Augmented Workflow’s <a href="https://github.com/antonyjclements/augmented-workflow/blob/3dfcf486d1068d2a0d4a27ebb436612592051799/.scripts/aw-gate.js#L283-L378">.scripts/aw-gate.js</a>. Its receipt mechanism requires an agent to leave a small structured record before a gate can be marked complete, when receipts are required.</p>
+<p>The script checks that the receipt is valid JSON, names the expected gate, includes a non-empty summary and has a timestamp within the allowed window. An accepted receipt is consumed, and the <a href="https://github.com/antonyjclements/augmented-workflow/blob/3dfcf486d1068d2a0d4a27ebb436612592051799/.scripts/aw-gate.js#L751-L786">gate state</a> records the current commit and time.</p>
+<p>That catches some fairly mundane failures. There was no receipt. The receipt belonged to another gate. The summary was empty. The timestamp was too old. These are exactly the sorts of things a conversational “all done” can glide past.</p>
+<p>It would be easy to describe this as proof that the review ran. That would be claiming too much. The receipt is written by the agent. A plausible summary can be wrong, and a timestamp can be invented. The validator checks those fields without independently observing the review.</p>
+<p>So the useful claim is quite small: the configured workflow requires a recent, correctly shaped record. Omitting that record becomes visible. Whether I trust what it says depends on how it was produced and what supports it.</p>
+<h2>What changed afterwards</h2>
+<p>There’s another question that is easier to answer mechanically: has the relevant code changed since the review was recorded?</p>
+<p>AW’s <a href="https://github.com/antonyjclements/augmented-workflow/blob/3dfcf486d1068d2a0d4a27ebb436612592051799/.scripts/aw-gate.js#L803-L847">commit-based freshness check</a> compares configured paths between the recorded commit and the target being checked. If those paths changed, the gate fails. The default target is HEAD; a working-tree check can also include uncommitted changes to tracked files.</p>
+<p>Suppose a review is recorded, then the agent commits another change to a file in the checked scope. The earlier marker no longer satisfies that check. Nobody has to remember to ask whether the review came before or after the latest edit. The script can establish the difference.</p>
+<p>That still leaves the original review’s quality open. It also leaves anything outside the configured paths open. But it removes one ambiguity at low cost.</p>
+<p><a href="https://github.com/antonyjclements/augmented-workflow/blob/3dfcf486d1068d2a0d4a27ebb436612592051799/.scripts/aw-gate.js#L1653-L1691">Traceability</a> offers a similar example. AW can check that recognised specification requirements have test annotations and that test or code references point to requirements which exist. A missing link can fail the check.</p>
+<p>The link says a test claims to cover a requirement. Reading an annotation doesn’t establish that the test runs, that its assertions are meaningful, or that it covers the difficult case. Those questions need further evidence. Even so, finding a requirement with no claimed test connection is useful before I spend time deciding whether the connection is any good.</p>
+<h2>Evidence can be misleading</h2>
+<p>The handwashing analogy has an obvious weakness. Water can run without anyone washing their hands properly. If the only thing I reward is the sound of the tap, I’ve made the sound of the tap the target.</p>
+<p>The same problem appears in development. Require a review summary and an agent can produce a review summary. Require a test annotation and it can add one. This needn’t involve any deliberate deception. It may simply misunderstand the requirement and produce both the implementation and the evidence from that same misunderstanding.</p>
+<p>That’s why evidence needs a source. An agent’s account of a test run and a result captured from the test runner deserve different weight. A test result tied to the code being reviewed tells me more than a pasted success message with no clear origin. Neither tells me whether I chose the right assertions.</p>
+<p>Enforcement matters too. A script which rejects missing evidence only helps if it actually runs. If the agent can skip the command, bypass the hook or rewrite the record, I need to understand that limit. Putting an important check somewhere the agent cannot quietly avoid it is a separate job from writing the check.</p>
+<h2>How much checking is enough</h2>
+<p>I don’t want to spend dinner standing outside the bathroom collecting a complete history of the taps. Nor do I want an agent workflow that produces more paperwork than code I can use.</p>
+<p>Each check should answer a question worth asking. What omission would it catch? What happens if that omission gets through? What does a pass actually establish? If I can’t explain the answer, I’m likely to mistake another green tick for useful assurance.</p>
+<p>The amount of checking should follow the consequences. A reversible internal tidy-up can take a smaller path. A change to permissions or persistent data deserves closer attention, because undoing a mistake may be expensive or impossible. Counting completed steps won’t make that decision for me.</p>
+<p>The value of deterministic checks is that I can be precise about their limits. A required record exists. A checked path still matches the recorded commit. A stated requirement has a claimed test connection. Each answer narrows what I still need to investigate.</p>
+<p>I still have to decide whether the evidence is credible and whether the work is good enough. The missing records, stale reviews and broken links are questions a script can answer. That leaves me more attention for the things it can’t. Dinner still needs cooking.</p>
+  </article>
+</main>
+<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><a href="/feed.xml">RSS feed ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
+
+</body>
+</html>
+

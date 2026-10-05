@@ -6,6 +6,13 @@
     <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
     <language>en-us</language>
     <item>
+      <title>Did you wash your hands?</title>
+      <link>https://antonyjclements.github.io/posts/did-you-wash-your-hands/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/did-you-wash-your-hands/</guid>
+      <pubDate>Mon, 05 Oct 2026 13:20:00 GMT</pubDate>
+      <description>Deterministic checks in agentic development. The missing records, stale reviews and broken links are questions a script can answer. That leaves me more attention for the things it can’t.</description>
+    </item>
+    <item>
       <title>Code Without a Theory</title>
       <link>https://antonyjclements.github.io/posts/code-without-a-theory/</link>
       <guid isPermaLink="true">https://antonyjclements.github.io/posts/code-without-a-theory/</guid>
@@ -14,3 +21,4 @@
     </item>
   </channel>
 </rss>
+
