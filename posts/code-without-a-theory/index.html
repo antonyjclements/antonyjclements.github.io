@@ -19,7 +19,7 @@
 <main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL TRANSMISSIONS</a>
   <article><p class="eyebrow">TRANSMISSION_001 / AI & ENGINEERING</p>
     <h1>Code Without a Theory</h1>
-    <p class="meta">Sep 30, 2026 &middot; Antony Clements</p>
+    <p class="meta">July 2026 &middot; Antony Clements</p>
 <h2>Twenty approvals</h2>
 <p>File write? Yes. Bash script? Yes. File write? Yes. Install a dependency? Yes. Yes. Yes.</p>
 <p>Somewhere in that run, the agent set up a local file-based data store. I&rsquo;d expected DynamoDB. It never asked me about that one. It asked about everything else, so I was busy clicking through file writes and shell commands while the one decision that changed the shape of the system went through without a prompt. I found it later, reading a file while I was chasing a different bug. I was lucky.</p>
@@ -40,7 +40,7 @@
 <p>When you write code yourself, you have to make decisions as you go. That doesn&rsquo;t guarantee you understand the whole system. But by the time a diff exists, you&rsquo;ve had a chance to build an understanding of why it looks like that, because you made it look like that.</p>
 <p>When an agent writes it, you can get the code without going through that process. If nobody stays close enough to the decisions, review becomes an attempt to build an understanding that no accountable person has yet developed.</p>
 <p>I don&rsquo;t want to overstate this. Agent output isn&rsquo;t random. It carries your prompt, the examples you showed it, whatever local context it read, and everything it picked up in training. There are scraps of theory in there. A supervising engineer can still hold the system-level understanding and answer questions about it. The risk is that the workflow lets implementation move ahead without anyone doing that work. Code review often quietly relies on someone having done it.</p>
-<p>Naur&rsquo;s dead program had a team once, and the team left. Agent code can show up already in that state on day one: it runs, it&rsquo;s useful, and nobody accountable understands it well enough to change it confidently. When that happens, it costs twice over. There&rsquo;s more of it, and it&rsquo;s harder to check because the reviewer has to build the missing understanding too.</p>
+<p>Naur&rsquo;s dead program had a team once, and the team left. Agent code can show up already in that state on day one: it runs, it&rsquo;s useful, and nobody accountable understands it well enough to change it confidently. When that happens, code reviews cost twice over. There&rsquo;s more of it, and it&rsquo;s harder to check because the reviewer has to build the missing understanding too.</p>
 <h2>The ratchet</h2>
 <p>The usual advice is discipline. Read diffs properly, slow down, build the theory yourself. I don&rsquo;t think discipline is the main problem here. The problem is money and time.</p>
 <p>I started using agents because they&rsquo;re fast. If checking their work costs as much as writing it used to, the speed-up is gone. The person who checks everything doesn&rsquo;t get the productivity they were promised. The person who doesn&rsquo;t check ships code nobody verified. The incentives reward skimming, and you can&rsquo;t fix incentives with a memo.</p>
