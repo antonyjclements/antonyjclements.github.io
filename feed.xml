@@ -6,6 +6,13 @@
     <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
     <language>en-us</language>
     <item>
+      <title>Picking up where the last agent stopped</title>
+      <link>https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</guid>
+      <pubDate>Mon, 19 Oct 2026 23:15:29 -0400</pubDate>
+      <description>The next session should not have to reconstruct a conversation we could have summarised properly before leaving.</description>
+    </item>
+    <item>
       <title>Teaching the repo what you keep correcting</title>
       <link>https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/</link>
       <guid isPermaLink="true">https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/</guid>
