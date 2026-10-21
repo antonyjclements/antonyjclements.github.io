@@ -2,7 +2,7 @@
 
 Personal blog of Antony Clements — notes on AI-augmented software engineering.
 
-Published via GitHub Pages. New posts go in `posts/`; update `index.html` and `feed.xml`.
+Published via GitHub Pages. New posts go in `posts/`; update `index.html` and `feed.xml`. The Experiments section lives in `experiments/`; keep it discoverable from the shared navigation and home page.
 
 ## Local preview
 

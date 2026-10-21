@@ -6,6 +6,13 @@
     <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
     <language>en-us</language>
     <item>
+      <title>Experiments: finding where project memory helps</title>
+      <link>https://antonyjclements.github.io/experiments/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/experiments/</guid>
+      <pubDate>Wed, 21 Oct 2026 15:20:51 -0400</pubDate>
+      <description>Testing where persistent project memory helps agents, where it adds work, and what the evidence means for Augmented Workflow.</description>
+    </item>
+    <item>
       <title>Picking up where the last agent stopped</title>
       <link>https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</link>
       <guid isPermaLink="true">https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</guid>
