@@ -7,12 +7,14 @@ Published via GitHub Pages. New posts go in `posts/`; update `index.html`, `feed
 ## Local preview
 
 Run `python3 -m http.server 8000` from the repository root, then open
-`http://localhost:8000`. No build step or external dependencies are needed.
+`http://localhost:8000`. No build step or package installation is needed. Google Fonts requires an
+internet connection; system fonts provide fallbacks when it is unavailable.
 
 ## Arcade theme
 
 The home page and essays share `styles.css` and `arcade.js`. Original pixel art
-lives in `assets/`. Add the shared header, footer, stylesheet, and deferred script
+lives in `assets/`. Add the shared header, footer, Google Fonts stylesheet and preconnect links,
+local stylesheet, and deferred script
 when creating a new post.
 
 Enter **↑ ↑ ↓ ↓ ← → ← → B A** to unlock the secret arcade, or select **INSERT
@@ -52,3 +54,7 @@ JetBrains Mono for dates, navigation and labels, and Silkscreen for short eyebro
 labels. All families use `display=swap` with system fallbacks. Wrap ampersands
 inside Silkscreen labels in `<span class="mono-amp">&amp;</span>` to render that
 character with JetBrains Mono.
+
+Each HTML page loads the Google Fonts stylesheet directly in its head, with
+preconnect hints for `fonts.googleapis.com` and `fonts.gstatic.com` (the latter
+uses `crossorigin`). Keep these links when adding a page.
