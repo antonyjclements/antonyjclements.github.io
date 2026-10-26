@@ -8,62 +8,76 @@
   <link rel="stylesheet" href="/styles.css">
   <link rel="canonical" href="https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/">
 <meta name="theme-color" content="#0b101b"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><script src="/arcade.js" defer></script>
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Antony Clements">
+  <meta property="og:title" content="Picking up where the last agent stopped — Antony Clements">
+  <meta property="og:description" content="The next session should not have to reconstruct a conversation we could have summarised properly before leaving.">
+  <meta property="og:url" content="https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/">
+  <meta property="og:image" content="https://antonyjclements.github.io/assets/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Antony Clements — Notes on building software, in the site’s dark arcade theme.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Picking up where the last agent stopped — Antony Clements">
+  <meta name="twitter:description" content="The next session should not have to reconstruct a conversation we could have summarised properly before leaving.">
+  <meta name="twitter:image" content="https://antonyjclements.github.io/assets/social-preview.png">
+  <meta name="twitter:image:alt" content="Antony Clements — Notes on building software, in the site’s dark arcade theme.">
+  <meta property="article:published_time" content="2026-10-19">
 </head>
 <body class="article-page"><a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header"><div class="inner header-row">
   <a class="brand" href="/" aria-label="Antony Clements home"><span class="brand-icon" aria-hidden="true">&gt;_</span><span>ANTONY<span class="brand-dot">.</span>CLEMENTS</span></a>
-  <nav aria-label="Main navigation"><a href="/#transmissions">Writing</a><a href="/experiments/">Experiments</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a></nav>
-  <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button>
+  <nav aria-label="Main navigation"><a href="/#transmissions" aria-current="location">Writing</a><a href="/experiments/">Experiments</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a><a class="nav-rss" href="/feed.xml">RSS</a></nav>
 </div></header>
 
-<main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL TRANSMISSIONS</a>
-  <article><p class="eyebrow">TRANSMISSION_004 / AI &amp; ENGINEERING</p>
+<main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL WRITING</a>
+  <article><p class="eyebrow">ESSAY 04 · AI &amp; ENGINEERING</p>
     <h1>Picking up where the last agent stopped</h1>
-    <p class="meta"><time datetime="2026-10-19">19 October 2026</time> &middot; Antony Clements</p>
+    <p class="meta"><time datetime="2026-10-19">19 OCT 2026</time><span>7 MIN READ</span><span>ANTONY CLEMENTS</span></p>
 <p>If you were handing an unfinished feature to a colleague, you probably wouldn’t point them at a branch and say “carry on”. You would explain what you were trying to achieve, where you had got to, and anything they should know before changing it.</p>
 <p>A fresh agent session faces much the same handover problem. It can inspect the files, but that does not tell it which approach was agreed, which alternative was rejected, or whether the passing tests cover the part you were worried about. Without that context, it may continue on a different basis.</p>
-<p>In <a href="https://antonyjclements.github.io/posts/code-without-a-theory/">Code Without a Theory</a>, I wrote about the understanding behind a program and how much of it is missing from the code itself. We recognise that gap when one person takes over from another, and I think it is a useful place to start when deciding what an agent needs.</p>
-<p>My <a href="https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/">last article</a> looked at corrections that should survive beyond a conversation. Here I want to look at the unfinished work itself: what would make a handover useful to whoever picks it up next?</p>
-<h2>What “carry on” leaves out</h2>
+<p>In <a href="/posts/code-without-a-theory/">Code Without a Theory</a>, I wrote about the understanding behind a program and how much of it is missing from the code itself. We recognise that gap when one person takes over from another, and I think it is a useful place to start when deciding what an agent needs.</p>
+<p>My <a href="/posts/teaching-the-repo-what-you-keep-correcting/">last article</a> looked at corrections that should survive beyond a conversation. Here I want to look at the unfinished work itself: what would make a handover useful to whoever picks it up next?</p>
+<h2>What “carry on” leaves out<span class="brand-dot">.</span></h2>
 <p>Suppose we are adding a CSV export to a reporting screen. This is a hypothetical example, but the handover should be familiar to anyone who has taken over a partly finished feature.</p>
 <p>The requirement is to export every matching record using the filters selected in the UI, while the screen and its reporting API are paginated. Generating a CSV from the rows already loaded in the browser would give us a file that looks correct but contains only part of the result.</p>
 <p>Suppose the first session catches this, chooses a server-side export and adds the endpoint, but stops before the button is connected. A colleague looking at the branch might work out why the endpoint exists, although we would save them some investigation by explaining the decision.</p>
 <p>“CSV export mostly done” leaves either a person or an agent to decide what <em>mostly</em> means. I would find a checkpoint like this more useful:</p>
-<ul>
+<aside class="save-point" aria-label="Example CSV export checkpoint"><p class="eyebrow">SAVE POINT · CSV EXPORT</p><ul>
 <li>The export must include all matching records, not just the visible page.</li>
 <li>The endpoint is implemented; the UI is not connected.</li>
 <li>Browser-side generation was rejected because the UI only holds one page of results.</li>
 <li>The targeted endpoint checks passed at the recorded revision. The full suite and browser flow have not been checked.</li>
 <li>Next: connect the button to the endpoint, then verify an export containing more than one page of results.</li>
-</ul>
+</ul></aside>
 <p>There is nothing specifically agentic about that list. It would be an equally useful human-to-human handover because it explains the requirement, the state of the work, the reason for the approach and what still needs checking. In a real checkpoint, I would include the relevant file paths, revision, test commands and results so the recipient can follow them up.</p>
 <p>A colleague could reasonably suggest generating the CSV in the browser if they did not know about the pagination constraint, just as another agent could. Recording the reason lets either of them assess the decision without having to rediscover it.</p>
-<h2>A checkpoint and a project memory</h2>
+<h2>A checkpoint and a project memory<span class="brand-dot">.</span></h2>
 <p>In a team, I would expect a handover note and the project documentation to answer different questions. The handover tells the next person what they are taking on; the specification and decision records explain the behaviour we are trying to build.</p>
 <p>The export’s unfinished button belongs in the handover, while the requirement to include every matching record should still be easy to find long after the button is connected. Keeping those separate avoids turning temporary task instructions into permanent project guidance.</p>
 <p>In <a href="https://github.com/antonyjclements/augmented-workflow">Augmented Workflow</a>, the <a href="https://github.com/antonyjclements/augmented-workflow/blob/main/skills/aw-work/references/progress-tracking.md">workstream checkpoint</a> lives in a local, git-ignored progress file. The agent is instructed to maintain that record and reconcile it with the checkout when resuming; it is not an automatic restore of a previous session. Session logs and the generated context wiki provide the broader project context.</p>
 <p>The local file has a practical limitation: it will not follow a clone onto another machine. If the work is moving elsewhere, the checkpoint has to be transferred deliberately and checked against the destination. A handover saved only on someone’s laptop is of little use to a colleague working somewhere else, and the same applies here.</p>
-<h2>Helping someone find their way around</h2>
+<h2>Helping someone find their way around<span class="brand-dot">.</span></h2>
 <p>A colleague joining a project needs somewhere to start without reading its entire history. AW’s <a href="https://github.com/antonyjclements/augmented-workflow/blob/main/skills/aw-synthesize-memory/SKILL.md">memory-synthesis workflow</a> serves a similar purpose for agents: it reads session logs, extracts useful corrections, dead ends and recurring patterns, and regenerates a short project context wiki from the available material.</p>
 <p>This depends on those logs being captured in the first place. Hooks are optional, so ending a conversation does not guarantee that a record of it exists.</p>
 <p>The wiki is kept under 500 words and points towards active features, recent decisions, learnings and known dead ends. It is an optional starting point rather than context every session is guaranteed to receive, and its brevity makes the underlying records important.</p>
 <p>For the export, the checkpoint tells the next session where to connect the button, while the feature specification and decision record explain what the export must contain and why the server-side approach was chosen. The wiki helps the agent find those records.</p>
 <p>I would not expect an overview written for a person to preserve every qualification from the original discussion, and an agent-generated summary has the same problem. If a detail affects correctness, it needs to be recorded in the specification or decision itself rather than left for the summary to carry.</p>
 <p>AW regenerates the wiki rather than maintaining it through hand edits, and its links should point to durable repository artifacts instead of session-log paths that retention may later remove. That keeps the overview connected to records someone can still inspect when they need more than the summary.</p>
-<h2>Read the handoff, then check the checkout</h2>
+<h2>Read the handoff, then check the checkout<span class="brand-dot">.</span></h2>
 <p>Taking over from a colleague does not remove the need to look at the current state of the work. Their handover might have been accurate when they wrote it, but the branch could have moved or someone else could have changed the endpoint since then.</p>
 <p>For an agent, I would make that check an explicit part of resuming: read the checkpoint, inspect the branch and working changes, then compare the relevant files with what the note describes. A test result from the previous session tells us what passed then, not necessarily what passes now.</p>
 <p>The handover should make this investigation smaller. In the export example, it identifies the decision worth checking, the unfinished UI work and a useful verification step: comparing the exported records with the complete filtered result, rather than just the visible page.</p>
 <p>It also needs to distinguish an agreed decision from an open question. If a colleague wrote “we discussed limiting exports to 10,000 rows”, I would want to know whether that limit had been agreed before implementing it. An agent needs the same distinction made clear rather than treating mention of an option as permission to choose it.</p>
 <p>People can ask the person handing over, draw on earlier conversations and recognise who owns a decision. A fresh agent session may lack that background, so I would be more explicit about unresolved questions and when it should come back to a person for an answer.</p>
-<h2>Would this be enough to take over?</h2>
+<h2>Would this be enough to take over?<span class="brand-dot">.</span></h2>
 <p>Handing a colleague the entire chat history would technically give them more information, but it would also leave them to work out which parts still apply. Saving every tool response and plan revision creates a similar burden for the next agent. The useful work is deciding what the recipient needs to know and where they should look for the rest.</p>
 <p>A written handover can still omit a reason or describe a decision badly, and its existence does not tell us whether the recipient has understood it. I would test this one by asking a fresh session to explain what remains unfinished, why the export is server-side and what it would verify before calling the feature complete.</p>
 <p>If it proposes exporting the visible rows, or assumes that the browser flow has already been tested, there is something to revisit in the handover or how it was used. Those are the same misunderstandings I would want to catch while talking the work through with a colleague.</p>
 <p>That is the standard I would use when closing an unfinished agent session: leave the kind of handover I would want from another developer, with enough explanation to continue the work and enough honesty about what is still unknown. The next session should not have to reconstruct a conversation we could have summarised properly before leaving.</p>
-  </article>
+  </article><nav class="article-pagination" aria-label="More writing"><a href="/posts/teaching-the-repo-what-you-keep-correcting/"><span>← PREVIOUS LEVEL</span><strong>Teaching the repo what you keep correcting</strong></a><a href="/experiments/"><span>BONUS STAGE →</span><strong>Experiments: finding where project memory helps</strong></a></nav>
 </main>
-<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><a href="/feed.xml">RSS feed ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
+<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button><a href="/feed.xml">RSS ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
 
 </body>
 </html>

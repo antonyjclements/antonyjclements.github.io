@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Antony Clements — Notes on AI-augmented software engineering</title>
+    <title>Antony Clements — Notes on building software</title>
     <link>https://antonyjclements.github.io/</link>
-    <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
+    <description>Notes on building software by Antony Clements.</description>
     <language>en-us</language>
+    <atom:link href="https://antonyjclements.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <lastBuildDate>Mon, 26 Oct 2026 04:09:19 GMT</lastBuildDate>
     <item>
       <title>Experiments: finding where project memory helps</title>
       <link>https://antonyjclements.github.io/experiments/</link>
