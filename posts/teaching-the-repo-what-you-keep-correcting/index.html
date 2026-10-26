@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teaching the repo what you keep correcting &mdash; Antony Clements</title>
+  <meta name="description" content="The aim is for the next session to benefit from attention already spent, while leaving room to discover that the old advice no longer fits.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="canonical" href="https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/">
+<meta name="theme-color" content="#0b101b"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><script src="/arcade.js" defer></script>
+</head>
+<body class="article-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner header-row">
+  <a class="brand" href="/" aria-label="Antony Clements home"><span class="brand-icon" aria-hidden="true">&gt;_</span><span>ANTONY<span class="brand-dot">.</span>CLEMENTS</span></a>
+  <nav aria-label="Main navigation"><a href="/#transmissions">Writing</a><a href="/experiments/">Experiments</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a></nav>
+  <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button>
+</div></header>
+
+<main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL TRANSMISSIONS</a>
+  <article><p class="eyebrow">TRANSMISSION_003 / AI &amp; ENGINEERING</p>
+    <h1>Teaching the repo what you keep correcting</h1>
+    <p class="meta"><time datetime="2026-10-11">11 October 2026</time> &middot; Antony Clements</p>
+<h2>The same correction again</h2>
+<p>“I think you’re looking at an older version?”</p>
+<p>There’s a <a href="https://github.com/antonyjclements/augmented-workflow/blob/main/docs/learnings/2026-07-02-verify-repo-state-before-evaluating.md">learning in Augmented Workflow</a> with that correction in it. An agent had delivered an evaluation against a version of the repo with roughly thirty-three skills. The repo had already been consolidated to twenty, and a field guide had been added. The evaluation was confidently describing something that was no longer there.</p>
+<p>The immediate repair is straightforward: read the current files and do the evaluation again. The more interesting question is what happens next time.</p>
+<p>A correction costs attention. Someone has to notice the mistake, work out what assumption produced it, and explain the difference. If that explanation disappears at the end of the conversation, the next session can make the same mistake for the same reason. The repo changes; the supervision starts over.</p>
+<p>Writing the correction down seems an obvious answer. But there are several ways to write this one down, and some would leave the next agent worse off.</p>
+<h2>What should survive</h2>
+<p>“There are twenty skills” would have been accurate at the time. Put it into permanent guidance and it becomes another stale fact waiting to mislead someone.</p>
+<p>“Check the current repo before evaluating its structure” survives a change in the number. It also tells the agent where to get an answer when the remembered one is wrong.</p>
+<p>The recorded lesson goes further. It explains that skills consolidate, files move and registries change. It names the situations where a fresh look matters: evaluations, reviews for drift, and returning after the branch may have moved. It gives a small action to take before drawing conclusions: inspect recent commits, list the relevant directories and reread the files.</p>
+<p>That’s enough to change how the next evaluation starts. It preserves the reason the correction was needed.</p>
+<p>This is where I’d start with any repeated correction. What assumption made the wrong approach seem reasonable? What would have exposed that assumption before the work went ahead?</p>
+<p>The answer may be a check, a missing constraint or a decision somebody already made. “Be more careful” won’t help much. The next agent needs something it can actually do.</p>
+<h2>Where it applies</h2>
+<p>A correction also needs a boundary.</p>
+<p>Suppose I ask an agent to leave an old API alone while changing a particular screen. There might be a migration in progress, another team depending on that API, or simply no reason to expand this job. Save “never change the old API” and a temporary constraint can become a permanent obstruction.</p>
+<p>A useful record would say which work it applied to and why. When the migration finishes, someone should be able to recognise that the reason has gone.</p>
+<p><a href="https://github.com/antonyjclements/augmented-workflow/blob/main/skills/aw-capture/SKILL.md">AW’s capture guidance</a> separates repo-specific lessons from preferences intended to apply across repositories. It asks before making a lesson global, and skips ordinary clarifications and preferences explicitly described as temporary.</p>
+<p>Those boundaries matter. A choice that was sensible in one codebase can be wrong in another. Even within one repo, the conditions can change.</p>
+<p>There’s a practical check here: could another engineer read the lesson and tell when to ignore it? If every sentence sounds like an instruction for all future work, it probably needs another pass.</p>
+<h2>How a note acquires authority</h2>
+<p>Once a lesson is written down, it starts to look established. Give it a title, put it in an index, load it at the start of a session, and the next agent has a reason to follow it.</p>
+<p>That can preserve a misunderstanding just as efficiently as a useful correction.</p>
+<p>In <a href="https://github.com/antonyjclements/augmented-workflow/blob/main/skills/aw-synthesize-memory/SKILL.md">AW’s synthesis guidance</a>, a new single-session learning starts as tentative. Corroboration across three sessions makes it active. Tentative entries are removed after three consecutive synthesis runs without corroboration. Turning a recurring pattern into a project standard requires human confirmation.</p>
+<p>The immediate correction still applies to the work at hand. The threshold concerns how much weight a stored generalisation should carry in later sessions.</p>
+<p>These are practical rules for managing the notes. Three sessions aren’t a demonstrated threshold for truth, and three quiet runs don’t establish that a lesson was wrong.</p>
+<p>The distinction matters because repeated records can share a mistake. Three sessions may all have inherited the same bad instruction. An agent may describe a previous claim as something it has confirmed when it has only read it again.</p>
+<p>The stale-repo learning lists three source sessions. That gives me an audit trail to investigate. The count alone doesn’t show three independent tests, or establish that later evaluations improved.</p>
+<p>I still need to look at what happened in those sessions. Did the situation genuinely recur? Was the assumption checked against the repo? Did following the lesson help? A status field can organise that work, but it can’t answer those questions for me.</p>
+<h2>Memory needs maintenance too</h2>
+<p>There’s an awkward consequence of all this: the notes themselves become something to review.</p>
+<p>A lesson can be right when captured and wrong six months later. It can have an accurate explanation and an instruction that no longer follows from it. Two lessons can each make sense alone and conflict when they’re loaded together.</p>
+<p>Keeping the source and the reason gives someone a chance to resolve that. Without them, the instruction has to be accepted on trust or discarded on instinct.</p>
+<p>For the repo-state example, the note should send the agent back to current evidence. If a later summary turns it into a fixed description of the repo, the summary has lost the useful part.</p>
+<p>I’d also want a changed lesson to replace or clearly supersede the old one. Appending a correction somewhere else leaves the next reader to discover that there are two answers and work out which came last.</p>
+<p>All of this costs something. A growing collection of instructions consumes context and reading time. Capturing every minor adjustment would create another pile of material that somebody ought to review and probably won’t.</p>
+<h2>Did the next session improve?</h2>
+<p>The easiest thing to count is the number of learning files. It tells me very little about whether this is working.</p>
+<p>For the stale-repo correction, I’d want to see a later evaluation inspect the current tree before describing it. Better still, check what happens after the structure changes again. Does the agent find the new shape, or faithfully repeat the last saved count?</p>
+<p>I’d also look for fewer repeated corrections when comparable work comes around. Silence by itself is weak evidence: perhaps nobody checked, or the relevant situation never arose. The useful observation is that the agent reached the point where it previously went wrong and handled it properly.</p>
+<p>In <a href="https://antonyjclements.github.io/posts/code-without-a-theory/">Code Without a Theory</a>, I wrote about keeping the reasons behind decisions available. In <a href="https://antonyjclements.github.io/posts/did-you-wash-your-hands/">Did you wash your hands?</a>, I wrote about asking what the evidence actually establishes. A learning record needs both.</p>
+<p>The aim is for the next session to benefit from attention already spent, while leaving room to discover that the old advice no longer fits.</p>
+<p>A good place to start is the correction you’re tired of making. Write down what caused it, where the lesson applies and what the next agent should check. Then watch what happens when it gets another chance to make the same mistake.</p>
+  </article>
+</main>
+<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><a href="/feed.xml">RSS feed ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
+
+</body>
+</html>
+

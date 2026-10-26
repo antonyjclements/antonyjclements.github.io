@@ -6,6 +6,34 @@
     <description>Essays and notes by Antony Clements on AI-augmented software engineering.</description>
     <language>en-us</language>
     <item>
+      <title>Experiments: finding where project memory helps</title>
+      <link>https://antonyjclements.github.io/experiments/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/experiments/</guid>
+      <pubDate>Wed, 21 Oct 2026 15:20:51 -0400</pubDate>
+      <description>Testing where persistent project memory helps agents, where it adds work, and what the evidence means for Augmented Workflow.</description>
+    </item>
+    <item>
+      <title>Picking up where the last agent stopped</title>
+      <link>https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/picking-up-where-the-last-agent-stopped/</guid>
+      <pubDate>Mon, 19 Oct 2026 23:15:29 -0400</pubDate>
+      <description>The next session should not have to reconstruct a conversation we could have summarised properly before leaving.</description>
+    </item>
+    <item>
+      <title>Teaching the repo what you keep correcting</title>
+      <link>https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/teaching-the-repo-what-you-keep-correcting/</guid>
+      <pubDate>Sun, 11 Oct 2026 21:45:00 -0400</pubDate>
+      <description>The aim is for the next session to benefit from attention already spent, while leaving room to discover that the old advice no longer fits.</description>
+    </item>
+    <item>
+      <title>Did you wash your hands?</title>
+      <link>https://antonyjclements.github.io/posts/did-you-wash-your-hands/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/did-you-wash-your-hands/</guid>
+      <pubDate>Mon, 05 Oct 2026 13:20:00 GMT</pubDate>
+      <description>Deterministic checks in agentic development. The missing records, stale reviews and broken links are questions a script can answer. That leaves me more attention for the things it can’t.</description>
+    </item>
+    <item>
       <title>Code Without a Theory</title>
       <link>https://antonyjclements.github.io/posts/code-without-a-theory/</link>
       <guid isPermaLink="true">https://antonyjclements.github.io/posts/code-without-a-theory/</guid>
@@ -14,3 +42,4 @@
     </item>
   </channel>
 </rss>
+

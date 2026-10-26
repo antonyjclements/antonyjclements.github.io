@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Experiments: finding where project memory helps &mdash; Antony Clements</title>
+  <meta name="description" content="Testing where persistent project memory helps agents, where it adds work, and what the evidence means for Augmented Workflow.">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="canonical" href="https://antonyjclements.github.io/experiments/">
+<meta name="theme-color" content="#0b101b"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><script src="/arcade.js" defer></script>
+</head>
+<body class="article-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner header-row">
+  <a class="brand" href="/" aria-label="Antony Clements home"><span class="brand-icon" aria-hidden="true">&gt;_</span><span>ANTONY<span class="brand-dot">.</span>CLEMENTS</span></a>
+  <nav aria-label="Main navigation"><a href="/#transmissions">Writing</a><a href="/experiments/" aria-current="page">Experiments</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a></nav>
+  <button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button>
+</div></header>
+
+<main id="main" class="article-main"><a class="back-link" href="/">← HOME</a>
+<article><p class="eyebrow">EXPERIMENTS / INTRODUCTION</p>
+<h1>Experiments: finding where project memory helps</h1>
+<p class="meta"><time datetime="2026-10-21">21 October 2026</time> &middot; Antony Clements</p>
+<p>I’m adding an Experiments section to document a question at the heart of <a href="https://github.com/antonyjclements/augmented-workflow">Augmented Workflow</a>: does giving an agent persistent project memory make it more effective, with less guidance and correction from the people working with it?</p>
+<p>AW is built around preserving the knowledge that accumulates as a project develops. That includes decisions and their rationale, specifications, coding standards, a context wiki, session logs and lessons from previous work. The expectation is that an agent joining the project can use that knowledge instead of requiring someone to reconstruct it each time.</p>
+<p>It is a reasonable expectation, but it needs testing. Reading and maintaining those records takes effort, and some of the information may already be clear from the code and tests. I want to understand where the memory layer provides a net benefit, where it adds unnecessary work, and what needs to change when it falls short.</p>
+<h2>The handoff problem</h2>
+<p>The underlying problem is familiar to anyone who has joined an existing project. The current implementation tells you a great deal about what the system does, but it may leave you guessing about why a decision was made, which alternatives were rejected or what remains unfinished.</p>
+<p>A human colleague benefits from a handover that explains those things. An agent should have access to the same kind of useful context. Knowing that an endpoint is implemented but the interface is not connected, or that targeted checks passed while the browser flow remains untested, gives either one a better starting point than “mostly done.”</p>
+<p>The benefit could extend beyond a single handover. A decision made during product design may matter later to engineering, support or marketing. A coding standard may need to survive several changes of agent. A session log may preserve the reason an apparently obvious approach was abandoned.</p>
+<p>Those are the situations I want to investigate, rather than assuming that more documentation always improves the work.</p>
+<h2>What we are comparing</h2>
+<p>The central comparison is between a project with an accumulated memory layer and the same project without one. Both retain their code, tests and ordinary implementation comments. Both can ask a helpful stakeholder questions. The difference is whether established knowledge can also survive in maintained project records between sessions.</p>
+<p>Getting that distinction right took some work. Early comparisons gave both conditions access to the same history in different formats, which tested ways of organizing memory rather than the value of having a memory layer at all.</p>
+<p>A fair control should remain a capable agent with useful tools and access to answers. Removing helpful code or making the stakeholder deliberately uncooperative would manufacture an advantage for AW. Equally, memory should develop through the work rather than arrive as an answer sheet containing future requirements.</p>
+<p>The broader aim is to test the philosophy behind AW. Specific features and formats can be evaluated separately once there is evidence about which kinds of continuity are worth supporting.</p>
+<h2>What the first pilots suggest</h2>
+<p>The first pilots have already produced different outcomes.</p>
+<p>In a small billing project, fresh agents implemented order quotes, added batch quoting and then added refunds. The agents with memory and those without it passed the same acceptance checks on their first submissions. They asked the same number of stakeholder questions, repeated none and needed no corrections. Existing code and tests provided enough continuity for the later work, while memory added reading and maintenance. There was no measured guidance or correction benefit in that sequence.</p>
+<p>A second pilot explored a simulated handoff from product/design to engineering and then support-related work. An initial session established privacy requirements for a shared-device project. Later work needed parts of that policy that were not fully expressed in the existing interface code.</p>
+<p>Across the two matched project pairs, agents without the memory layer requested four repeated explanations, compared with one for agents with memory. Both conditions still passed every session’s acceptance checks on the first submission, without correction rounds. The observed difference was less repeated guidance, not better accepted code.</p>
+<p>There was a cost: the memory condition read more text and performed more recorded actions, including updating its notes. The stakeholder was scripted, so these requests did not interrupt a real person. We did not measure human time, token usage or financial cost, and the result does not establish a net productivity gain.</p>
+<p>These are small synthetic pilots with simulated roles, concise recent knowledge and only two matched project pairs in each study. They test AW-style memory, not a full AW installation or a real cross-functional team. They also bundle several kinds of knowledge together, so they cannot tell us whether a particular standard, decision record or session log deserves the credit.</p>
+<h2>What belongs in the evidence</h2>
+<p>The individual experiment write-ups will cover the tasks, comparison conditions, checks, results and limitations in enough detail to make the conclusions inspectable. This introduction sets out the questions those studies should answer.</p>
+<p>Correctness matters, but so do repeated explanations, correction rounds and the effort required to recover context. Any claim about efficiency must also account for the work of creating, finding and maintaining the records. A smaller number of questions is useful evidence only when we understand what replaced them.</p>
+<p>Negative findings belong alongside positive ones. If code and tests are sufficient, that helps identify where extra memory may be unnecessary. If stale notes mislead an agent, or a context wiki becomes too costly to navigate, that should lead to a documented change and another test. The same scrutiny applies when an experiment itself turns out to ask the wrong question.</p>
+<h2>Where to look next</h2>
+<p>I’m particularly interested in coding standards applied across features, context wikis that explain unfamiliar parts of a project, session logs that preserve unfinished work, and decisions that need to travel between functions. Cross-functional handoffs may be especially revealing because the next person or agent often needs knowledge that the previous implementation does not express.</p>
+<p>Those tests also need less favorable cases: conflicting records, changing requirements, older decisions and tasks where the code already provides everything necessary.</p>
+<p>Over time, this section should build a body of evidence about where persistent project memory earns its upkeep. When it helps, I want to understand why. When it does not, I want the result to improve AW and our understanding of when to use it.</p>
+</article></main>
+<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><a href="/feed.xml">RSS feed ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
+
+</body>
+</html>
