@@ -15,6 +15,10 @@ The home page and essays share `styles.css` and `arcade.js`. Original pixel art
 lives in `assets/`. Add the shared header, footer, stylesheet, and deferred script
 when creating a new post.
 
+Fonts are self-hosted in `assets/fonts/` (SIL Open Font License, see `OFL.txt`):
+Inter for body text, Space Grotesk for headings, JetBrains Mono for labels, and
+Silkscreen for the pixel eyebrows.
+
 Enter **↑ ↑ ↓ ↓ ← → ← → B A** to unlock the secret arcade, or select **INSERT
 COIN** in the footer (also works on touch screens). Pick **Invaders**,
 **Breakout**, or **Maze Chase**, then press **START**. Move with arrow keys or A/D. In Invaders,
