@@ -42,4 +42,13 @@ Run metadata and discovery checks with `python3 -m unittest discover -s tests -p
 The home page features the newest essay above a numbered writing list and a
 separate experiments band. When adding a post, update its estimated reading
 time in the home listing and article metadata, and maintain the previous/next
-article links. Essays use serif body text and share the header and arcade footer.
+article links. Essays use Literata body text and share the header and arcade footer.
+
+## Fonts
+
+Google Fonts serves Inter for body text, Literata with automatic optical sizing
+for article text, Space Grotesk for headings,
+JetBrains Mono for dates, navigation and labels, and Silkscreen for short eyebrow
+labels. All families use `display=swap` with system fallbacks. Wrap ampersands
+inside Silkscreen labels in `<span class="mono-amp">&amp;</span>` to render that
+character with JetBrains Mono.

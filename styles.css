@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&family=JetBrains+Mono:wght@400;500;700&family=Silkscreen&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 :root {
   color-scheme:dark;
   --bg:#0b101b;
@@ -8,7 +10,9 @@
   --lime:#b7ef74;
   --cyan:#7bdde4;
   --purple:#af91ee;
-  --mono:ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+  --body:'Inter',Arial,Helvetica,sans-serif;
+  --heading:'Space Grotesk',Arial,Helvetica,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace;
 }
 * {
   box-sizing:border-box;
@@ -21,7 +25,7 @@ body {
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:Arial,Helvetica,sans-serif;
+  font-family:var(--body);
   line-height:1.65;
 }
 body::before {
@@ -967,9 +971,9 @@ nav { gap:28px; align-items:center; }
 .motion-toggle { font-size:8px; padding:4px 6px; }
 .article-main { max-width:760px; padding:74px 30px 88px; }
 .back-link { font-size:12px; margin-bottom:42px; }
-article { font-family:Georgia,'Times New Roman',serif; font-size:21px; line-height:1.7; color:#d7dbe3; }
+article { font-family:'Literata',Georgia,serif; font-optical-sizing:auto; font-size:21px; line-height:1.7; color:#d7dbe3; }
 article>.eyebrow { color:var(--purple); font-size:11px; margin:0 0 20px; }
-article h1,article h2,article h3 { font-family:Arial,Helvetica,sans-serif; }
+h1,h2,h3,.article-pagination strong { font-family:var(--heading); }
 article h1 { font-size:50px; line-height:1.12; letter-spacing:-1.5px; margin:0 0 30px; }
 article .meta { display:flex; flex-wrap:wrap; gap:24px; font:12px/1.7 var(--mono); text-transform:uppercase; border-block:1px solid var(--line); padding:14px 0; margin:0 0 48px; }
 article p { margin:26px 0; }
@@ -1058,3 +1062,21 @@ article ul { padding-left:26px; }
   .pilot-card p { font-size:16px; }
 }
 .site-header nav a[aria-current] { color:var(--lime); }
+
+/* Silkscreen is reserved for short eyebrow labels. */
+.eyebrow,.section-heading .eyebrow,.about-panel .eyebrow,
+article>.eyebrow,.save-point .eyebrow {
+  font-family:'Silkscreen',var(--mono);
+  font-weight:400;
+  font-size:12px;
+  line-height:1.7;
+  letter-spacing:1px;
+}
+.eyebrow .mono-amp { font-family:var(--mono); }
+.essay-number { font-family:var(--mono); font-size:16px; }
+.cheat-keys { font-family:var(--mono); font-size:11px; }
+@media(max-width:700px) {
+  .eyebrow,.about-panel .eyebrow,article>.eyebrow,.save-point .eyebrow { font-size:11px; }
+  .essay-number { font-size:14px; }
+  .cheat-keys { font-size:10px; }
+}
