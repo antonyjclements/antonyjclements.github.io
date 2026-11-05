@@ -6,7 +6,14 @@
     <description>Notes on building software by Antony Clements.</description>
     <language>en-us</language>
     <atom:link href="https://antonyjclements.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Mon, 26 Oct 2026 04:09:19 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 05 Nov 2026 03:58:49 GMT</lastBuildDate>
+    <item>
+      <title>When the guardrails need tests</title>
+      <link>https://antonyjclements.github.io/posts/when-the-guardrails-need-tests/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/when-the-guardrails-need-tests/</guid>
+      <pubDate>Thu, 05 Nov 2026 03:58:49 GMT</pubDate>
+      <description>A validator accepted a missing file and rejected an existing one. Paired tests exposed the bug and made the meaning of a pass clearer.</description>
+    </item>
     <item>
       <title>Experiments: finding where project memory helps</title>
       <link>https://antonyjclements.github.io/experiments/</link>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>When the guardrails need tests &mdash; Antony Clements</title>
+  <meta name="description" content="A validator accepted a missing file and rejected an existing one. Paired tests exposed the bug and made the meaning of a pass clearer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,700&amp;family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Silkscreen&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap">
+<link rel="stylesheet" href="/styles.css">
+  <link rel="canonical" href="https://antonyjclements.github.io/posts/when-the-guardrails-need-tests/">
+<meta name="theme-color" content="#0b101b"><link rel="icon" href="/assets/favicon.svg" type="image/svg+xml"><script src="/arcade.js" defer></script>
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Antony Clements">
+  <meta property="og:title" content="When the guardrails need tests — Antony Clements">
+  <meta property="og:description" content="A validator accepted a missing file and rejected an existing one. Paired tests exposed the bug and made the meaning of a pass clearer.">
+  <meta property="og:url" content="https://antonyjclements.github.io/posts/when-the-guardrails-need-tests/">
+  <meta property="og:image" content="https://antonyjclements.github.io/assets/social-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Antony Clements — Notes on building software, in the site’s dark arcade theme.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="When the guardrails need tests — Antony Clements">
+  <meta name="twitter:description" content="A validator accepted a missing file and rejected an existing one. Paired tests exposed the bug and made the meaning of a pass clearer.">
+  <meta name="twitter:image" content="https://antonyjclements.github.io/assets/social-preview.png">
+  <meta name="twitter:image:alt" content="Antony Clements — Notes on building software, in the site’s dark arcade theme.">
+  <meta property="article:published_time" content="2026-11-05">
+</head>
+<body class="article-page"><a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><div class="inner header-row">
+  <a class="brand" href="/" aria-label="Antony Clements home"><span class="brand-icon" aria-hidden="true">&gt;_</span><span>ANTONY<span class="brand-dot">.</span>CLEMENTS</span></a>
+  <nav aria-label="Main navigation"><a href="/#transmissions" aria-current="location">Writing</a><a href="/experiments/">Experiments</a><a href="/#about">About</a><a href="https://github.com/antonyjclements">GitHub <span aria-hidden="true">↗</span></a><a class="nav-rss" href="/feed.xml">RSS</a></nav>
+</div></header>
+
+<main id="main" class="article-main"><a class="back-link" href="/#transmissions">← ALL WRITING</a>
+  <article><p class="eyebrow">ESSAY 05 · AI <span class="mono-amp">&amp;</span> ENGINEERING</p>
+    <h1>When the guardrails need tests</h1>
+    <p class="meta"><time datetime="2026-11-05">5 NOV 2026</time><span>6 MIN READ</span><span>ANTONY CLEMENTS</span></p>
+<p>In <a href="/posts/did-you-wash-your-hands/">Did you wash your hands?</a>, I wrote about using deterministic checks to answer narrow questions about an agent's work. A script can tell me that a required record is missing or a reference is broken, leaving more attention for the decisions that need judgement. That depends, of course, on the script answering its question correctly.</p>
+<p>A recent experiment found a fairly ordinary bug in one of Augmented Workflow's checks. A missing document could pass validation, while an existing document could be rejected. Both failures came from the way the checker read a comment in an index file.</p>
+<p>The fix has now shipped to the project's main branch. The part worth explaining is how the tests exposed the problem, particularly why an apparently successful check had been giving us less evidence than it seemed.</p>
+<h2>A small question about a file</h2>
+<p>AW keeps indexes that help an agent find specifications, decisions and other project records. An index is useful only if the references it contains lead somewhere, so one of the checks looks for documentation paths and verifies that their targets exist.</p>
+<p>This is a modest requirement. Finding a decision record does not establish that the decision is current, well explained or appropriate for the work. It does let us catch a broken reference before someone follows it while trying to understand the project.</p>
+<p>The index uses a limited YAML format, with fields such as <code>path</code> and <code>spec</code>. Someone maintaining it might put quotes around a filename or add a comment after it. Neither should change which file is being referenced.</p>
+<p>Here is the kind of field that exposed the missed check:</p>
+<pre><code class="language-yaml">path: "docs/decisions/absent.md" # still missing</code></pre>
+<p>In the test repository, that file did not exist. The original checker nevertheless accepted the index.</p>
+<h2>Two ways to get the wrong answer</h2>
+<p>The parser tried to remove enclosing quotes before dealing with the trailing comment. Because the whole value ended with the comment rather than a closing quote, it left the leading quote in place. The next stage only checked values beginning with <code>docs/</code>, so this value was skipped without testing whether its target existed. The relevant <a href="https://github.com/antonyjclements/augmented-workflow/blob/4266982a4c045aaa9365a1195f0f79cffc7552a4/.scripts/aw-gate.js#L1006-L1112">parser and existence check</a> make that sequence visible.</p>
+<p>A quoted path with a comment also passed when its target did exist. Looking at that result alone, I could have concluded that the format worked. Pairing it with a missing target showed why that conclusion would have been wrong: both received the same answer because neither reached the existence check.</p>
+<p>There was a failure in the other direction too:</p>
+<pre><code class="language-yaml">path: docs/decisions/note#1.md # reviewed</code></pre>
+<p>Here, <code>note#1.md</code> was a real file. The hash in its name was part of the filename, while the later hash introduced a comment. The parser retained the trailing comment as part of the path, looked for the wrong filename and rejected a valid index.</p>
+<p>These two cases matter together. Testing only missing files would tell us whether the check could stop some broken references. Testing only existing files could miss a check that quietly skipped them. A useful validator has to distinguish the two, including when the input is written in an ordinary variation of the supported format.</p>
+<h2>Testing the check itself</h2>
+<p>The supplemental experiment set out six reserved cases and their expected answers before developing the candidate fix, then froze the candidate before running those cases. They included existing and missing targets, quoted values, literal hashes, a plain path and a malformed list entry. The original source and candidate were run against the same examples, with both sets of results retained.</p>
+<p>The original accepted three of the four valid cases and rejected one of the two invalid cases. The candidate classified all six correctly. That is enough to demonstrate the two specific failures and their correction on those inputs, although six related examples leave plenty of possible parser behaviour untested.</p>
+<p>The expected answers also needed checking independently of AW. A later review used a separate YAML parser and inspected the fixture files and saved results. That review was retrospective; it did not independently rerun the reserved cases or regression suites. Keeping that distinction visible matters when describing how much confidence the evidence supports.</p>
+<p>For the merged change, the <a href="https://github.com/antonyjclements/augmented-workflow/blob/9d99efacb882b13d988d8867e8c191c4137a5a40/test/gate/derived-state.test.js#L160-L200">regression tests</a> cover a wider set of combinations. Both reference fields are tested at the start of an entry and as continuation fields, with bare, single-quoted and double-quoted values, including literal hashes. Each form is checked with its target present and absent. Another case checks that a commented specification reference remains discoverable through the feature index.</p>
+<p>That adds 49 regression cases. For missing targets, they also check the reported filename, which helps establish that the failure came from the intended condition rather than an unrelated error.</p>
+<h2>What shipped</h2>
+<p>The <a href="https://github.com/antonyjclements/augmented-workflow/pull/78">merged change</a> removes an inline comment before stripping enclosing quotes, using the existing quote-aware helper. It updates both the source distributed by the installer and the copy AW uses in its own repository. The correction is available on main at <a href="https://github.com/antonyjclements/augmented-workflow/commit/9d99efacb882b13d988d8867e8c191c4137a5a40">commit 9d99efac</a>.</p>
+<p>The shipping validation passed all 65 derived-state cases, the 162-case gate suite and the original six reserved cases. Two broader checks still failed in the same way on unchanged main: an installation check expected 20 bundled skills where there were 21, and a behaviour check expected tracing to be disabled despite the current configuration enabling it. Those failures are recorded in the pull request rather than hidden behind a claim that everything passed.</p>
+<p>This is a correction on main, without a new tagged release or an automatic update to existing installations. The parser still supports a deliberately narrow index format; the change does not establish general YAML compatibility.</p>
+<h2>A fix is a different result from an agent benefit</h2>
+<p>The wider experiment also compared automatic enforcement with voluntary checking. There were eight agent runs, arranged as four matched pairs across two small task families. Both groups had the same project information, tools and constraints, and both could run the checks themselves. The difference was whether a check also ran automatically at submission.</p>
+<p>All eight agents voluntarily checked their work and passed every measured component at the first and final endpoints. There were four paired ties, with no invalid submission for automatic enforcement to stop. Those small, strongly cued tasks gave us no observed correctness advantage from enforcement, and they tell us little about its value in a real team.</p>
+<p>Finding a bug in the checker does not change that result. It gives us a concrete improvement to make while the broader effectiveness question remains open, which is one of the reasons I wanted to <a href="/experiments/">run these experiments</a> in the first place.</p>
+<p>For this check, the most useful test was the pairing: a reference to a file that exists and the same supported form pointing to one that does not. It made the meaning of a pass much clearer. I still have to read the document and decide whether it helps explain the project, but I can now have better-founded confidence in the narrower answer the script was supposed to give me.</p>
+  </article><nav class="article-pagination" aria-label="More writing"><a href="/posts/picking-up-where-the-last-agent-stopped/"><span>← PREVIOUS LEVEL</span><strong>Picking up where the last agent stopped</strong></a><a href="/experiments/"><span>BONUS STAGE →</span><strong>Experiments: finding where project memory helps</strong></a></nav>
+</main>
+<footer class="site-footer"><div class="inner footer-row"><p>© 2026 Antony Clements <span class="footer-divider">/</span> Built with curiosity. Powered by tea.</p><div><button class="motion-toggle" type="button" aria-pressed="false" aria-label="Pause visual animations">FX <span>ON</span></button><a href="/feed.xml">RSS ↗</a><button class="secret-trigger" type="button" aria-label="Enter the secret arcade">INSERT COIN <span aria-hidden="true">◇</span></button></div></div></footer>
+
+</body>
+</html>
