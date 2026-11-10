@@ -6,7 +6,14 @@
     <description>Notes on building software by Antony Clements.</description>
     <language>en-us</language>
     <atom:link href="https://antonyjclements.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <lastBuildDate>Thu, 05 Nov 2026 03:58:49 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 10 Nov 2026 14:37:11 GMT</lastBuildDate>
+    <item>
+      <title>Project memory, automatic checks and the work worth measuring</title>
+      <link>https://antonyjclements.github.io/posts/project-memory-automatic-checks/</link>
+      <guid isPermaLink="true">https://antonyjclements.github.io/posts/project-memory-automatic-checks/</guid>
+      <pubDate>Tue, 10 Nov 2026 14:37:11 GMT</pubDate>
+      <description>Memory reduced repeated explanations at equal measured correctness. Automatic checks tied on correctness. What the experiment shows, and what still needs measuring.</description>
+    </item>
     <item>
       <title>When the guardrails need tests</title>
       <link>https://antonyjclements.github.io/posts/when-the-guardrails-need-tests/</link>
